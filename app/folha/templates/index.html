@@ -1,0 +1,387 @@
+<!doctype html>
+<html lang="pt-BR">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="theme-color" content="#f3f5f2">
+    <title>Folha Clara | Demonstrativo de pagamento</title>
+    <style>
+      :root {
+        color-scheme: light;
+        --fundo: #f3f5f2;
+        --superficie: #ffffff;
+        --texto: #172623;
+        --texto-suave: #65736f;
+        --borda: #dce4df;
+        --verde: #176b54;
+        --verde-escuro: #104b3d;
+        --verde-claro: #e8f3ed;
+        --azul-noite: #142c2b;
+        --erro: #9d342b;
+        --sombra: 0 24px 70px rgba(24, 49, 42, .09);
+      }
+
+      * { box-sizing: border-box; }
+      body {
+        min-width: 320px;
+        min-height: 100vh;
+        margin: 0;
+        color: var(--texto);
+        background:
+          radial-gradient(ellipse at 85% 5%, rgba(210, 230, 218, .55), transparent 34rem),
+          var(--fundo);
+        font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+        line-height: 1.55;
+      }
+      button, input { font: inherit; }
+      .pagina { width: min(1120px, calc(100% - 48px)); margin: 0 auto; }
+      .cabecalho {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        min-height: 88px;
+        border-bottom: 1px solid rgba(33, 64, 54, .1);
+      }
+      .marca { display: inline-flex; align-items: center; gap: 12px; color: inherit; text-decoration: none; }
+      .marca-icone {
+        display: grid;
+        width: 42px;
+        height: 42px;
+        place-items: center;
+        color: #fff;
+        background: var(--verde-escuro);
+        border-radius: 14px;
+      }
+      .marca-nome { display: block; font-size: .98rem; font-weight: 750; letter-spacing: -.025em; }
+      .marca-legenda { display: block; color: var(--texto-suave); font-size: .75rem; }
+      .selo-cabecalho {
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        padding: 8px 12px;
+        color: #405a50;
+        background: rgba(255, 255, 255, .72);
+        border: 1px solid var(--borda);
+        border-radius: 999px;
+        font-size: .78rem;
+        font-weight: 650;
+      }
+      .selo-ponto { width: 7px; height: 7px; background: #56a77c; border-radius: 50%; }
+      .conteudo { padding: 76px 0 42px; }
+      .introducao { max-width: 700px; margin: 0 0 34px; }
+      .sobretitulo {
+        display: flex;
+        align-items: center;
+        gap: 9px;
+        margin: 0 0 15px;
+        color: var(--verde);
+        font-size: .75rem;
+        font-weight: 800;
+        letter-spacing: .12em;
+        text-transform: uppercase;
+      }
+      .sobretitulo::before { width: 22px; height: 1px; background: var(--verde); content: ""; }
+      h1 { max-width: 680px; margin: 0; font-size: clamp(2.4rem, 5vw, 4rem); line-height: 1.06; letter-spacing: -.065em; }
+      .introducao-texto { max-width: 560px; margin: 18px 0 0; color: var(--texto-suave); font-size: 1.05rem; }
+      .painel {
+        display: grid;
+        grid-template-columns: minmax(0, 1.08fr) minmax(330px, .92fr);
+        overflow: hidden;
+        background: var(--superficie);
+        border: 1px solid rgba(30, 64, 52, .1);
+        border-radius: 26px;
+        box-shadow: var(--sombra);
+      }
+      .formulario-painel { padding: clamp(26px, 4vw, 46px); }
+      .painel-titulo { margin: 0; font-size: 1.2rem; letter-spacing: -.03em; }
+      .painel-descricao { margin: 6px 0 28px; color: var(--texto-suave); font-size: .91rem; }
+      .campo { margin-top: 20px; }
+      .campo-cabecalho { display: flex; align-items: baseline; justify-content: space-between; gap: 12px; margin-bottom: 8px; }
+      label { font-size: .88rem; font-weight: 700; }
+      .campo-ajuda { color: var(--texto-suave); font-size: .75rem; }
+      .entrada-conjunto {
+        display: flex;
+        align-items: center;
+        min-height: 54px;
+        overflow: hidden;
+        background: #fff;
+        border: 1px solid #cfdad3;
+        border-radius: 12px;
+        transition: border-color .18s ease, box-shadow .18s ease;
+      }
+      .entrada-conjunto:focus-within { border-color: var(--verde); box-shadow: 0 0 0 4px rgba(23, 107, 84, .13); }
+      .entrada-conjunto:has(input:invalid:not(:placeholder-shown)) { border-color: #d58a80; }
+      input {
+        width: 100%;
+        min-width: 0;
+        height: 52px;
+        padding: 0 14px;
+        color: var(--texto);
+        background: transparent;
+        border: 0;
+        outline: 0;
+      }
+      input::placeholder { color: #9aa6a0; }
+      .prefixo-moeda {
+        display: grid;
+        align-self: stretch;
+        min-width: 54px;
+        place-items: center;
+        color: #61716a;
+        background: #f5f8f5;
+        border-right: 1px solid var(--borda);
+        font-size: .9rem;
+        font-weight: 700;
+      }
+      .texto-ajuda { margin: 7px 0 0; color: var(--texto-suave); font-size: .77rem; }
+      .botao-principal {
+        display: flex;
+        width: 100%;
+        min-height: 54px;
+        align-items: center;
+        justify-content: center;
+        gap: 10px;
+        margin-top: 27px;
+        padding: 12px 18px;
+        color: #fff;
+        background: var(--verde-escuro);
+        border: 0;
+        border-radius: 12px;
+        box-shadow: 0 8px 16px rgba(16, 75, 61, .14);
+        cursor: pointer;
+        font-weight: 750;
+        transition: background .18s ease, transform .18s ease, box-shadow .18s ease;
+      }
+      .botao-principal:hover:not(:disabled) { background: #0b3f33; box-shadow: 0 11px 20px rgba(16, 75, 61, .2); transform: translateY(-1px); }
+      .botao-principal:focus-visible, input:focus-visible { outline: 3px solid #78b99a; outline-offset: 3px; }
+      .botao-principal:disabled { cursor: wait; opacity: .72; }
+      .nota-demonstrativa { display: flex; gap: 10px; margin: 19px 0 0; color: var(--texto-suave); font-size: .76rem; }
+      .nota-demonstrativa svg { flex: 0 0 16px; margin-top: 2px; color: var(--verde); }
+      .resumo-painel {
+        position: relative;
+        display: flex;
+        min-height: 100%;
+        flex-direction: column;
+        padding: clamp(26px, 4vw, 42px);
+        color: #f2f7f3;
+        background:
+          radial-gradient(ellipse at 90% 0%, rgba(88, 142, 111, .25), transparent 20rem),
+          var(--azul-noite);
+      }
+      .resumo-cabecalho { display: flex; align-items: center; justify-content: space-between; gap: 14px; }
+      .resumo-cabecalho h2 { margin: 0; font-size: 1.13rem; letter-spacing: -.025em; }
+      .resumo-status { padding: 5px 9px; color: #b8d8c4; background: rgba(143, 197, 164, .12); border: 1px solid rgba(172, 217, 187, .2); border-radius: 999px; font-size: .7rem; font-weight: 700; }
+      .resumo-vazio { display: flex; flex: 1; flex-direction: column; align-items: center; justify-content: center; min-height: 240px; padding: 24px 0; text-align: center; }
+      .resumo-ilustracao { display: grid; width: 76px; height: 76px; place-items: center; color: #b4d9c1; background: rgba(164, 207, 178, .1); border: 1px solid rgba(190, 222, 199, .18); border-radius: 24px; }
+      .resumo-vazio h3 { margin: 19px 0 5px; font-size: 1rem; }
+      .resumo-vazio p { max-width: 250px; margin: 0; color: #adbfba; font-size: .83rem; }
+      .resultado { margin-top: 32px; }
+      .resultado-nome { margin: 5px 0 22px; color: #afc3bd; font-size: .84rem; }
+      .resultado-lista { display: grid; gap: 0; margin: 0; }
+      .resultado-linha { display: flex; justify-content: space-between; gap: 16px; padding: 13px 0; border-bottom: 1px solid rgba(218, 236, 226, .14); }
+      .resultado-linha dt { color: #bdcbc7; font-size: .84rem; }
+      .resultado-linha dd { margin: 0; font-variant-numeric: tabular-nums; font-size: .9rem; font-weight: 650; text-align: right; }
+      .resultado-liquido { margin-top: 22px; padding: 18px; background: rgba(140, 190, 157, .12); border: 1px solid rgba(166, 207, 177, .2); border-radius: 16px; }
+      .resultado-liquido-label { display: block; color: #c6d9cd; font-size: .8rem; }
+      .resultado-liquido-valor { display: block; margin-top: 2px; color: #f5fbf6; font-size: clamp(1.8rem, 3.4vw, 2.35rem); font-variant-numeric: tabular-nums; font-weight: 760; letter-spacing: -.045em; }
+      .mensagem-erro { margin: 30px 0 0; padding: 14px 15px; color: #ffe3de; background: rgba(157, 52, 43, .2); border: 1px solid rgba(255, 172, 157, .35); border-radius: 12px; font-size: .88rem; }
+      .rodape { display: flex; justify-content: space-between; gap: 18px; padding: 19px 2px 28px; color: #75817c; font-size: .74rem; }
+
+      @media (max-width: 760px) {
+        .pagina { width: min(100% - 32px, 560px); }
+        .cabecalho { min-height: 74px; }
+        .selo-cabecalho { padding: 7px 10px; font-size: .69rem; }
+        .conteudo { padding-top: 48px; }
+        .introducao { margin-bottom: 26px; }
+        .painel { grid-template-columns: 1fr; border-radius: 22px; }
+        .resumo-painel { min-height: 340px; }
+        .resumo-vazio { min-height: 220px; }
+        .rodape { flex-direction: column; gap: 4px; }
+      }
+      @media (max-width: 420px) {
+        .pagina { width: calc(100% - 24px); }
+        .marca-icone { width: 38px; height: 38px; border-radius: 12px; }
+        .selo-cabecalho { max-width: 130px; text-align: center; }
+        .conteudo { padding-top: 38px; }
+        .formulario-painel, .resumo-painel { padding: 24px 20px; }
+        .campo-cabecalho { align-items: flex-start; flex-direction: column; gap: 2px; }
+      }
+      @media (prefers-reduced-motion: reduce) {
+        *, *::before, *::after { scroll-behavior: auto !important; transition-duration: .01ms !important; }
+      }
+    </style>
+  </head>
+  <body>
+    <div class="pagina">
+      <header class="cabecalho">
+        <a class="marca" href="/" aria-label="Folha Clara, página inicial">
+          <span class="marca-icone" aria-hidden="true">
+            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <path d="M5 19V5h8l6 6v8H5Z" stroke="currentColor" stroke-width="1.7" stroke-linejoin="round"/>
+              <path d="M13 5v6h6M8 15h8M8 12h2" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"/>
+            </svg>
+          </span>
+          <span><span class="marca-nome">Folha Clara</span><span class="marca-legenda">Demonstrativo de pagamento</span></span>
+        </a>
+        <span class="selo-cabecalho"><span class="selo-ponto" aria-hidden="true"></span>Simulação acadêmica</span>
+      </header>
+
+      <main class="conteudo">
+        <section class="introducao" aria-labelledby="titulo-principal">
+          <p class="sobretitulo">Cálculo demonstrativo</p>
+          <h1 id="titulo-principal">Entenda seu salário líquido com clareza.</h1>
+          <p class="introducao-texto">Informe os dados abaixo para visualizar um resumo simples do cálculo da folha de pagamento.</p>
+        </section>
+
+        <div class="painel">
+          <section class="formulario-painel" aria-labelledby="titulo-formulario">
+            <h2 class="painel-titulo" id="titulo-formulario">Dados do funcionário</h2>
+            <p class="painel-descricao">Preencha os campos para gerar o demonstrativo.</p>
+            <form id="formulario-folha">
+              <div class="campo">
+                <div class="campo-cabecalho">
+                  <label for="nome-funcionario">Nome do funcionário</label>
+                  <span class="campo-ajuda">Como devemos identificar?</span>
+                </div>
+                <div class="entrada-conjunto">
+                  <input id="nome-funcionario" name="nome_funcionario" autocomplete="name" placeholder="Ex.: Ana Silva" required minlength="2" maxlength="100" aria-describedby="ajuda-nome">
+                </div>
+                <p class="texto-ajuda" id="ajuda-nome">Informe o nome que aparecerá no resumo.</p>
+              </div>
+
+              <div class="campo">
+                <div class="campo-cabecalho">
+                  <label for="salario-bruto">Salário bruto</label>
+                  <span class="campo-ajuda">Valor antes dos descontos</span>
+                </div>
+                <div class="entrada-conjunto">
+                  <span class="prefixo-moeda" aria-hidden="true">R$</span>
+                  <input id="salario-bruto" name="salario_bruto" type="number" inputmode="decimal" min="0.01" step="0.01" placeholder="0,00" required aria-describedby="ajuda-salario">
+                </div>
+                <p class="texto-ajuda" id="ajuda-salario">Use um valor maior que zero.</p>
+              </div>
+
+              <button class="botao-principal" id="botao-calcular" type="submit">
+                <span>Calcular salário líquido</span>
+                <svg aria-hidden="true" width="18" height="18" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M5 12h14m-6-6 6 6-6 6" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>
+              </button>
+            </form>
+            <p class="nota-demonstrativa">
+              <svg aria-hidden="true" width="16" height="16" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><circle cx="12" cy="12" r="9" stroke="currentColor" stroke-width="1.7"/><path d="M12 11v5m0-8h.01" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg>
+              <span>Simulação acadêmica com alíquota ilustrativa. O resultado não substitui um cálculo oficial de folha.</span>
+            </p>
+          </section>
+
+          <section class="resumo-painel" aria-labelledby="titulo-resumo">
+            <div class="resumo-cabecalho">
+              <h2 id="titulo-resumo">Resumo do cálculo</h2>
+              <span class="resumo-status" id="status-resumo">Aguardando dados</span>
+            </div>
+            <div id="resultado" aria-live="polite" aria-atomic="true">
+              <div class="resumo-vazio" id="resumo-vazio">
+                <span class="resumo-ilustracao" aria-hidden="true">
+                  <svg width="34" height="34" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><rect x="4" y="3" width="16" height="18" rx="3" stroke="currentColor" stroke-width="1.5"/><path d="M8 8h8M8 12h3m-3 4h2m4-4h2m-2 4h2" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>
+                </span>
+                <h3>Seu resumo aparece aqui</h3>
+                <p>Depois de preencher os dados, você verá os valores organizados nesta área.</p>
+              </div>
+            </div>
+          </section>
+        </div>
+      </main>
+
+      <footer class="rodape">
+        <span>Folha Clara · Projeto acadêmico de QTS</span>
+        <span>Os valores exibidos são apenas demonstrativos.</span>
+      </footer>
+    </div>
+
+    <script>
+      const formularioFolha = document.querySelector("#formulario-folha");
+      const botaoCalcular = document.querySelector("#botao-calcular");
+      const conteudoBotao = botaoCalcular.querySelector("span");
+      const areaResultado = document.querySelector("#resultado");
+      const statusResumo = document.querySelector("#status-resumo");
+      const formatadorMoeda = new Intl.NumberFormat("pt-BR", { style: "currency", currency: "BRL" });
+
+      function adicionarLinhaResumo(rotulo, valor) {
+        const linha = document.createElement("div");
+        linha.className = "resultado-linha";
+        const nome = document.createElement("dt");
+        nome.textContent = rotulo;
+        const conteudo = document.createElement("dd");
+        conteudo.textContent = formatadorMoeda.format(valor);
+        linha.append(nome, conteudo);
+        return linha;
+      }
+
+      function exibirResultado(dados) {
+        const resultado = document.createElement("div");
+        resultado.className = "resultado";
+        const nomeFuncionario = document.createElement("p");
+        nomeFuncionario.className = "resultado-nome";
+        nomeFuncionario.textContent = "Demonstrativo para " + dados.nome_funcionario;
+        const listaValores = document.createElement("dl");
+        listaValores.className = "resultado-lista";
+        listaValores.append(
+          adicionarLinhaResumo("Salário bruto", dados.salario_bruto),
+          adicionarLinhaResumo("Desconto previdenciário", dados.desconto_previdenciario)
+        );
+        const salarioLiquido = document.createElement("div");
+        salarioLiquido.className = "resultado-liquido";
+        const rotuloLiquido = document.createElement("span");
+        rotuloLiquido.className = "resultado-liquido-label";
+        rotuloLiquido.textContent = "Salário líquido";
+        const valorLiquido = document.createElement("strong");
+        valorLiquido.className = "resultado-liquido-valor";
+        valorLiquido.textContent = formatadorMoeda.format(dados.salario_liquido);
+        salarioLiquido.append(rotuloLiquido, valorLiquido);
+        resultado.append(nomeFuncionario, listaValores, salarioLiquido);
+        areaResultado.replaceChildren(resultado);
+        statusResumo.textContent = "Cálculo concluído";
+      }
+
+      function exibirErro(mensagem) {
+        const aviso = document.createElement("p");
+        aviso.className = "mensagem-erro";
+        aviso.setAttribute("role", "alert");
+        aviso.textContent = mensagem;
+        areaResultado.replaceChildren(aviso);
+        statusResumo.textContent = "Não foi possível calcular";
+      }
+
+      formularioFolha.addEventListener("submit", async (evento) => {
+        evento.preventDefault();
+        botaoCalcular.disabled = true;
+        botaoCalcular.setAttribute("aria-busy", "true");
+        conteudoBotao.textContent = "Calculando...";
+        statusResumo.textContent = "Calculando";
+        areaResultado.textContent = "Consultando os dados para montar o resumo...";
+        const dadosFormulario = Object.fromEntries(new FormData(formularioFolha));
+        dadosFormulario.salario_bruto = Number(dadosFormulario.salario_bruto);
+
+        try {
+          const resposta = await fetch("/api/folha", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify(dadosFormulario)
+          });
+          const dadosResposta = await resposta.json();
+          if (!resposta.ok) {
+            const mensagem = Array.isArray(dadosResposta.detail)
+              ? "Confira o nome e informe um salário bruto maior que zero."
+              : dadosResposta.detail;
+            throw new Error(mensagem || "Não foi possível calcular a folha agora.");
+          }
+          exibirResultado(dadosResposta);
+        } catch (erro) {
+          exibirErro(erro.message || "Ocorreu um erro ao consultar a folha. Tente novamente.");
+        } finally {
+          botaoCalcular.disabled = false;
+          botaoCalcular.removeAttribute("aria-busy");
+          conteudoBotao.textContent = "Calcular salário líquido";
+        }
+      });
+    </script>
+  </body>
+</html>
